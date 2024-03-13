@@ -46,3 +46,12 @@
     flex-grow: 1;
     margin: 5px;
 }
+
+.column {
+    background-color: #f0f0f0;
+    flex-grow: 1;
+    margin: 5px;
+    padding: 5px; /* Add padding inside the columns for text */
+    font-size: 12px; /* This matches the default font size used in calculations */
+    line-height: 1.2; /* This matches the line height multiplier used in calculations */
+}

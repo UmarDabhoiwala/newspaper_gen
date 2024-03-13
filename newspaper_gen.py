@@ -116,23 +116,55 @@ def split_chunks_into_columns(chunks):
 
     return new_chunks
 
+def generate_lorem_ipsum(length):
+    lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 10
+    return (lorem_ipsum * (length // len(lorem_ipsum) + 1))[:length]
+
+def calculate_column_capacity(column_width, column_height, font_size=12, line_height_multiplier=1.2, char_width=7):
+    line_height = font_size * line_height_multiplier
+    chars_per_line = column_width // char_width
+    lines_per_column = column_height // line_height
+    return int(chars_per_line * lines_per_column)
+
+def calculate_chunk_capacity(chunk):
+    total_capacity = 0
+    for column in chunk['content']['columns']:
+        column_width, column_height = column
+        capacity = calculate_column_capacity(column_width, column_height)
+        total_capacity += capacity
+    return total_capacity
 
 def generate_chunk_html(chunk):
+    # Calculate the total capacity for the chunk
+    chunk_capacity = calculate_chunk_capacity(chunk) // 2
+    print(chunk_capacity)
+
+    # Generate Lorem Ipsum text based on the chunk's capacity
+    chunk_text = generate_lorem_ipsum(chunk_capacity)
+
     content_columns = chunk['content']['columns']
     content_height = chunk['content']['height']
     content_width = sum(column[0] for column in content_columns)
+
+    # Split the generated text evenly across the columns
+    num_columns = len(content_columns)
+    split_texts = [chunk_text[i::num_columns] for i in range(num_columns)]
+
+    print(split_texts)
 
     html = f'<div class="chunk" style="width: {content_width}px;">\n'
     html += f'  <div class="heading" style="width: {content_width}px; height: 50px;"></div>\n'
     html += f'  <div class="content" style="height: {content_height}px;">\n'
 
-    for column_width, _ in content_columns:
-        html += f'    <div class="column" style="width: {column_width}px;"></div>\n'
+    for i, (column_width, _) in enumerate(content_columns):
+        column_text = split_texts[i]
+        html += f'    <div class="column" style="width: {column_width}px;">{column_text}</div>\n'
 
     html += '  </div>\n'
     html += '</div>\n'
 
     return html
+
 
 def generate_page():
     chunks = generate_chunks()
